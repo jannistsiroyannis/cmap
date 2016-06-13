@@ -9,7 +9,7 @@ There are two macros that need to expanded into your code to use this library
 _DECLARE_MAP( V, K, SN, FN )
 _IMPLEMENT_MAP( V, K, SN, FN, C, H  )
 
-* _DECLARE_MAP can and should be expanded in any c/header files where maps are to be used.
+* _DECLARE_MAP can and should be expanded in any c/header files where maps of this particular type are to be used.
 * _IMPLEMENT_MAP should only be expanded in exactly ONE c file in your code. Multiples of this macro will result in linking problems.
 
 The parameters of the macros are as follows:
@@ -18,7 +18,7 @@ The parameters of the macros are as follows:
 * K : The TYPE of keys in the map
 * SN : the TYPENAME of the map object itself (must begin with "struct ").
 * FN : the prefix to use for functions accessing this type of map.
-* C : A function pointer to a comparison-function for your KEY type. The function must have the following signature: `int function ( const K * key0, const K * key1 )` The function must return 0 on equality.
+* C : A function pointer to a comparison-function for your key type. The function must have the following signature: `int function ( const K * key0, const K * key1 )` The function must return 0 on equality.
 * H : a hash function for your key type. The function must have the following signature: `unsigned hash(const K* str)`.
 
 
