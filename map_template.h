@@ -18,7 +18,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
- ******************************************************************************/
+*******************************************************************************/
 
 #ifndef MAP_TEMPLATE_H_
 #define MAP_TEMPLATE_H_
@@ -52,30 +52,6 @@ SOFTWARE.
   if ( str_map_get(&map, key, &value) == 0 )
     printf("Map had \"%s\" mapped to %d\n", key, value);
  
- 
-  functions:
- 
-  _create(unsigned size, char growing):
-  size is the initial size of the internal buffer (in objects/slots not bytes!)
-  growing should be set to nonzero if you want to allow the internal buffer
-  to resize dynamically.
-
-  _get():
-  returns 0 on success, 1 if the key is already in the map (=no changes made).
-
-  _remove():
-  returns 0 on success, 1 if the key was not there (=no changes made).
-
-  _get(table, key, V* out):
-  returns 0 on success and sets "out", 1 if the key was not there.
-
-  _get_ind():
-  returns pointer to value on success, NULL otherwise
-
-  _for_each_key[_ind](table, function):
-  calls "function" for each key, "function" may return a non-zero value to
-  delete the current element during iteration. Must return zero otherwise.
-
  ******************************************************************************/
 
 #define _DECLARE_MAP( V, K, SN, FN )			\
@@ -97,35 +73,97 @@ SOFTWARE.
       char inUse;					\
    };							\
 							\
-							\
+   /**
+      Creates a new instance of this map.
+
+      size: the initial size of the hashtable (in
+      objects, not bytes).
+
+      growing: a nonzero value will cause the map to
+      grow dynamically when needed.
+
+      Returns: an instance of this map.
+   */							\
    SN							\
    FN##_create(unsigned int size, char growing);	\
 							\
+   /**
+      Destroys a previously created instance of this map.
+   */							\
    void FN##_destroy(SN* table);			\
 							\
+   /**
+      Inserts a key-value pair into the map.
+
+      Returns: 0 on success, 1 if the key is already in
+      the map (=no changes made).
+   */							\
    int FN##_insert(					\
       SN* table, V value, K key);			\
 							\
+   /**
+      Removes a key-value pair from the map.
+
+      returns: 0 on success, 1 if the key was not in the
+      map (=no changes made).
+   */							\
    int							\
    FN##_remove(SN* table, K key);			\
 							\
+   /**
+      Gets a value from the map.
+
+      Returns 0 on success and sets "out_value".
+      Returns 1 if the key was not in the map.
+   */							\
    int							\
    FN##_get(						\
       SN* table,					\
       K key,						\
       V* out_value);					\
 							\
+   /**
+      Gets a pointer to a value from the map.
+
+      Returns valid pointer on success.
+      Returns NULL-pointer if the key was not in the map.
+   */							\
    V*							\
    FN##_get_ind(					\
       SN* table,					\
       K key);						\
 							\
+   /**
+      Gets the number of key-value pairs in the map.
+   */							\
    unsigned int						\
    FN##_get_count(SN* table);				\
 							\
+   /**
+      Execute "func" once for every key in the map.
+      Optionally delete each key-value pair after
+      executing func.
+
+      func: Must be a function with signature:
+            int func(K); This function should return
+            non-zero if the given key-value pair should
+            be deleted and zero otherwise.
+   */							\
    void							\
    FN##_for_each_key(SN* table,				\
 		     int (*func) (K) );			\
+							\
+   /**
+      Execute "func" once for every key in the map (as a
+      pointer).
+      Optionally delete each key-value pair after
+      executing func.
+
+      func: Must be a function with signature:
+            int func(K*); This function should return
+            non-zero if the given key-value pair should
+            be deleted and zero otherwise.
+   */							\
    void							\
    FN##_for_each_key_ind(SN* table,			\
 			 int (*func) (K*) );		\
